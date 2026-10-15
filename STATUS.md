@@ -152,6 +152,14 @@ Hosted demo on Google Cloud, project `hackathonapac` (the account's project quot
 | Gemini availability probe | `gemini-2.5-flash` answers in `asia-south1` (200); `gemini-2.5-flash-lite` 404 in asia-south1 but available globally |
 | **First live Gemini run:** full `reclaim-demo rehearse` in-process with GeminiVertexLLM (gemini-2.5-flash, asia-south1, thinking off) | Every step passed; 10.0 s API time (Gemma locally: ~34 s); status `live: last call succeeded` |
 | Fix found | Gemini 2.5 thinks by default and those tokens count against max output; now `thinking_budget=0` (setting `GEMINI_THINKING_BUDGET`) |
+| `deploy.sh infra` | Artifact Registry `reclaimai`; private bucket `hackathonapac-reclaim-files`; Cloud SQL `reclaim-db` (PostgreSQL 16, db-f1-micro, RUNNABLE); 4 generated secrets; 3 service accounts |
+| `deploy.sh build` (Cloud Build) | api, worker, web images built and pushed (about 3 min) |
+| `deploy.sh deploy` | Services: web https://reclaim-web-646340175107.asia-south1.run.app (passcode), api (private), worker; migrate job → 0010; reset job → 6 assets |
+| Access checks | api without identity → 403; worker task without token → 401; web /gate → 200 |
+| **Full rehearsal against the cloud API** (owner identity token in X-Serverless-Authorization) | Every step passed; 21.6 s API time; capabilities afterwards: llm **live** (Gemini 2.5 Flash, asia-south1), object_storage **live** (GCS) |
+| Cloud Logging, severity ≥ ERROR since deploy | none; no chat or registry text found in logs |
+| `deploy.sh reset` after rehearsal | 6 assets again |
+| Not done | Web flow through the passcode gate in a browser on the cloud URL (I don't type a live credential into a public site; verified locally with a test passcode) |
 
 Hosted demo preparation (`APP_MODE=demo`), run 2026-10-15. Nothing on Google Cloud yet.
 
