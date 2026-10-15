@@ -1,0 +1,30 @@
+{
+  "notice": "SYNTHETIC. A fictional stand-in for an unclaimed-deposit registry, made for the ReclaimAI demo. No real person, account or bank record. Authorized for demo matching only.",
+  "registry": "Fictional Unclaimed Deposits Registry (demo)",
+  "version": "2026-10-01",
+  "synthetic": true,
+  "authorized_use": "demo_matching",
+  "records": [
+    {"id": "DR-0001", "holder_name": "R K PATEL", "date_of_birth": "1958-03-14", "address": "12 Navrangpura, Ahmedabad", "pincode": "380009",
+     "institution": "Sagar Bharat Bank", "product": "fixed_deposit", "account_ref": "****7710", "amount_minor": 64200000, "currency": "INR",
+     "last_activity": "2009-06-30", "transferred_to_registry": "2020-01-15"},
+    {"id": "DR-0002", "holder_name": "RAMESH PATEL", "date_of_birth": "1971-11-02", "address": "4 CG Road, Navrangpura, Ahmedabad", "pincode": "380009",
+     "institution": "Sagar Bharat Bank", "product": "savings", "account_ref": "****3391", "amount_minor": 21500000, "currency": "INR",
+     "last_activity": "2011-02-11", "transferred_to_registry": "2021-03-01"},
+    {"id": "DR-0003", "holder_name": "RAMESH PATEL", "date_of_birth": null, "address": "Satellite Road, Ahmedabad", "pincode": "380015",
+     "institution": "Western Coastal Bank", "product": "fixed_deposit", "account_ref": "****0452", "amount_minor": 11000000, "currency": "INR",
+     "last_activity": "2008-09-30", "transferred_to_registry": "2018-12-01"},
+    {"id": "DR-0004", "holder_name": "SURESH KUMAR PATEL", "date_of_birth": "1958-03-14", "address": "12 Navrangpura, Ahmedabad", "pincode": "380009",
+     "institution": "Sagar Bharat Bank", "product": "savings", "account_ref": "****5520", "amount_minor": 3400000, "currency": "INR",
+     "last_activity": "2010-05-31", "transferred_to_registry": "2020-07-01"},
+    {"id": "DR-0005", "holder_name": "RAMESH PATIL", "date_of_birth": "1966-08-21", "address": "Shivaji Nagar, Pune", "pincode": "411005",
+     "institution": "Western Coastal Bank", "product": "savings", "account_ref": "****8813", "amount_minor": 5700000, "currency": "INR",
+     "last_activity": "2012-01-31", "transferred_to_registry": "2022-02-01"},
+    {"id": "DR-0006", "holder_name": "KAVITA MEHTA", "date_of_birth": "1975-02-09", "address": "Andheri West, Mumbai", "pincode": "400058",
+     "institution": "Western Coastal Bank", "product": "fixed_deposit", "account_ref": "****2207", "amount_minor": 9000000, "currency": "INR",
+     "last_activity": "2013-04-30", "transferred_to_registry": "2023-05-01"},
+    {"id": "DR-0007", "holder_name": "ANITA SHAH", "date_of_birth": "1962-12-01", "address": "Vastrapur, Ahmedabad", "pincode": "380015",
+     "institution": "Sagar Bharat Bank", "product": "savings", "account_ref": "****6648", "amount_minor": 1200000, "currency": "INR",
+     "last_activity": "2007-10-31", "transferred_to_registry": "2017-11-01"}
+  ]
+}

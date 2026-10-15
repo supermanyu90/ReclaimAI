@@ -1,0 +1,16 @@
+[project]
+name = "reclaim-worker"
+version = "0.1.0"
+description = "ReclaimAI asynchronous worker: Pub/Sub push consumer for projections, passports and analytics"
+requires-python = ">=3.12"
+dependencies = ["reclaim-api"]
+
+[project.scripts]
+reclaim-worker = "reclaim_worker:main"
+
+[tool.uv.sources]
+reclaim-api = { workspace = true }
+
+[build-system]
+requires = ["uv_build>=0.13.1,<0.14.0"]
+build-backend = "uv_build"

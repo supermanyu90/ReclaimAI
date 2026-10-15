@@ -1,0 +1,20 @@
+# Local PostgreSQL only. Cloud SQL replaces it in cloud mode (see docs/architecture.md).
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: reclaim
+      POSTGRES_PASSWORD: reclaim   # local-only throwaway credential
+      POSTGRES_DB: reclaim
+    ports:
+      - "127.0.0.1:${DB_PORT:-55432}:5432"
+    volumes:
+      - reclaim-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U reclaim -d reclaim"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  reclaim-db:

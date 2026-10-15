@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  python:
+    name: API + worker (lint, PII, tests)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: reclaim
+          POSTGRES_PASSWORD: reclaim
+          POSTGRES_DB: reclaim
+        ports: ["55432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U reclaim -d reclaim"
+          --health-interval 2s --health-timeout 3s --health-retries 20
+    env:
+      APP_MODE: local
+      DATABASE_URL: postgresql+psycopg://reclaim:reclaim@localhost:55432/reclaim
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --locked
+      - run: uv run ruff check apps workers tests
+      - run: bash scripts/lint-pii.sh
+      - run: cd apps/api && uv run alembic upgrade head
+      - run: uv run pytest
+
+  web:
+    name: Web (typecheck, build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+      - run: npx tsc --noEmit
+      - run: npm run build

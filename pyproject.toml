@@ -1,0 +1,29 @@
+[project]
+name = "reclaimai"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = ["reclaim-api", "reclaim-worker"]
+
+[tool.uv]
+package = false
+
+[tool.uv.workspace]
+members = ["apps/api", "workers"]
+
+[tool.uv.sources]
+reclaim-api = { workspace = true }
+reclaim-worker = { workspace = true }
+
+[dependency-groups]
+dev = ["pytest>=9.1.1", "httpx>=0.28.1", "ruff>=0.17.0"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["db: needs the local PostgreSQL from docker compose"]
+
+[tool.ruff]
+line-length = 140
+target-version = "py312"
+
+[tool.ruff.lint.isort]
+known-first-party = ["reclaim_api", "reclaim_worker"]

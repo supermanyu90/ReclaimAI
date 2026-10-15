@@ -1,0 +1,17 @@
+# Copy to terraform.tfvars (gitignored). Every location must be checked for the product first.
+project_id          = "your-project"
+region              = "asia-south1"
+vertex_location     = "asia-south1"      # verify GEMINI model availability here
+gemini_model        = "gemini-x.y-flash" # exact model ID from the Vertex AI model garden
+docai_location      = "us"               # Document AI multi-region of your processors
+docai_processor_id  = "ocr-processor-id"
+search_location     = "global"
+search_datastore_id = "reclaim-policies"
+bigquery_location   = "asia-south1"
+api_image           = "asia-south1-docker.pkg.dev/your-project/reclaimai/api:TAG"
+worker_image        = "asia-south1-docker.pkg.dev/your-project/reclaimai/worker:TAG"
+web_image           = "asia-south1-docker.pkg.dev/your-project/reclaimai/web:TAG"
+web_origin          = "https://reclaim-web-PROJECT_NUMBER.asia-south1.run.app"
+billing_account     = "000000-000000-000000"
+monthly_budget      = 5000
+alert_email         = "you@example.com"

@@ -1,0 +1,7 @@
+SYNTHETIC DEMO DOCUMENT - NOT A REAL CERTIFICATE
+Municipal Corporation (fictional)
+Certificate of Death
+Name of deceased: Ramesh Patel
+Date of death: [simulated]
+Registration number: SIM-0000
+This synthetic record exists only to exercise the human review path.

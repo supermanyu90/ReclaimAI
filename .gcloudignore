@@ -1,0 +1,15 @@
+# What `gcloud builds submit` must never upload: secrets, local data, dependencies, VCS.
+.env
+.env.*
+!.env.example
+.data/
+.git/
+.venv/
+**/node_modules/
+apps/web/.next/
+**/__pycache__/
+**/.pytest_cache/
+**/.ruff_cache/
+infra/terraform/.terraform/
+infra/terraform/*.tfstate*
+infra/terraform/terraform.tfvars

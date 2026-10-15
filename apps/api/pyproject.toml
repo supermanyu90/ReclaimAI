@@ -1,0 +1,47 @@
+[project]
+name = "reclaim-api"
+version = "0.1.0"
+description = "ReclaimAI API: authorization, workflow and orchestration"
+authors = [
+    { name = "supermanyu90", email = "mathurabhimanyu@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "alembic>=1.13",
+    "fastapi>=0.115",
+    "google-cloud-aiplatform>=1.60",
+    "google-cloud-bigquery>=3.20",
+    "google-cloud-discoveryengine>=0.13",
+    "google-cloud-documentai>=3",
+    "google-cloud-pubsub>=2.20",
+    "google-cloud-storage>=2.14",
+    "google-genai>=1.0",
+    "httpx>=0.28",
+    "joblib>=1.4",
+    "pandas>=2.2",
+    "psycopg[binary]>=3.2",
+    "pydantic-settings>=2.4",
+    "pypdf>=5",
+    "python-multipart>=0.0.9",
+    "reportlab>=4.2",
+    "requests>=2.31",
+    "scikit-learn>=1.5",
+    "sqlalchemy>=2.0",
+    "sqlglot>=25",
+    "uvicorn[standard]>=0.30",
+]
+
+[project.scripts]
+reclaim-api = "reclaim_api:main"
+reclaim-seed = "reclaim_api.seed:main"
+reclaim-telegram-sim = "reclaim_api.telegram.simulate:main"
+reclaim-events = "reclaim_api.events.cli:main"
+reclaim-transactions = "reclaim_api.analytics.synthetic:main"
+reclaim-classifier = "reclaim_api.classifier.cli:main"
+reclaim-policy-export = "reclaim_api.claims.search_export:main"
+reclaim-demo = "reclaim_api.demo:main"
+
+[build-system]
+requires = ["uv_build>=0.13.1,<0.14.0"]
+build-backend = "uv_build"
+

@@ -1,0 +1,178 @@
+{
+  "notice": "SYNTHETIC DEMO DATA. Every person, institution, reference and amount is fictional. Institutions resembling real ones are deliberately renamed.",
+  "fixture_version": "demo-1",
+  "tenants": [
+    { "key": "patel", "name": "Patel family (synthetic)" },
+    { "key": "mehta", "name": "Mehta family (synthetic, unrelated tenant)" }
+  ],
+  "users": [
+    { "key": "ramesh", "tenant": "patel", "display_name": "Ramesh Patel", "email": "ramesh.patel@example.invalid", "role": "owner" },
+    { "key": "priya", "tenant": "patel", "display_name": "Priya Shah", "email": "priya.shah@example.invalid", "role": "family" },
+    { "key": "reviewer_anil", "tenant": "patel", "display_name": "Anil Menon (reviewer)", "email": "anil.reviewer@example.invalid", "role": "reviewer" },
+    { "key": "reviewer_meera", "tenant": "patel", "display_name": "Meera Iyer (reviewer)", "email": "meera.reviewer@example.invalid", "role": "reviewer" },
+    { "key": "kavita", "tenant": "mehta", "display_name": "Kavita Mehta", "email": "kavita.mehta@example.invalid", "role": "owner" }
+  ],
+  "institutions": [
+    { "name": "Sagar Bharat Bank", "jurisdiction": "IN" },
+    { "name": "Kaveri Mutual Fund", "jurisdiction": "IN" },
+    { "name": "Navjeevan Life Assurance", "jurisdiction": "IN" },
+    { "name": "Rashtriya Pension Trust", "jurisdiction": "IN" },
+    { "name": "Merlion Harbour Bank", "jurisdiction": "SG" }
+  ],
+  "institution_aliases": {
+    "_note": "Sample real-bank utterances map to clearly labelled synthetic institutions. No real institution is integrated.",
+    "SBI": "Sagar Bharat Bank",
+    "State Bank": "Sagar Bharat Bank"
+  },
+  "documents": [
+    { "key": "doc_savings_stmt_2023", "tenant": "patel", "owner": "ramesh", "kind": "statement", "title": "Savings statement, Mar 2023 (synthetic)", "source_date": "2023-03-31", "content": "SYNTHETIC|Sagar Bharat Bank|savings statement|2023-03-31|closing balance 342150.00 INR|nominee: Priya Shah" },
+    { "key": "doc_mf_stmt_2026_09", "tenant": "patel", "owner": "ramesh", "kind": "statement", "title": "Mutual fund statement, Sep 2026 (synthetic)", "source_date": "2026-09-30", "content": "SYNTHETIC|Kaveri Mutual Fund|consolidated statement|2026-09-30|value 875400.00 INR|SIP 10000.00 monthly|nominee: not registered" },
+    { "key": "doc_mf_stmt_2026_09_reupload", "tenant": "patel", "owner": "ramesh", "kind": "statement", "title": "Mutual fund statement, Sep 2026 (re-uploaded, synthetic)", "source_date": "2026-09-30", "duplicate_of": "doc_mf_stmt_2026_09", "content": "SYNTHETIC|Kaveri Mutual Fund|consolidated statement|2026-09-30|value 875400.00 INR|SIP 10000.00 monthly|nominee: not registered" },
+    { "key": "doc_life_schedule", "tenant": "patel", "owner": "ramesh", "kind": "policy_schedule", "title": "Life policy schedule (synthetic)", "source_date": "2025-04-01", "content": "SYNTHETIC|Navjeevan Life Assurance|policy schedule|2025-04-01|sum assured 5000000.00 INR|nominee section illegible" },
+    { "key": "doc_property_list", "tenant": "patel", "owner": "ramesh", "kind": "handwritten_inventory", "title": "Handwritten list of property papers (synthetic)", "source_date": "2026-06-30", "content": "SYNTHETIC|handwritten|flat Kothrud Pune|sale deed in bank locker|home loan Sagar Bharat Bank outstanding 1240000" },
+    { "key": "doc_pension_stmt_2026", "tenant": "patel", "owner": "ramesh", "kind": "statement", "title": "Pension statement, Mar 2026 (synthetic)", "source_date": "2026-03-31", "content": "SYNTHETIC|Rashtriya Pension Trust|annual statement|2026-03-31|accumulated 1460000.00 INR|nomination registered" },
+    { "key": "doc_sgd_stmt", "tenant": "patel", "owner": "ramesh", "kind": "statement", "title": "SGD savings statement, Aug 2026 (synthetic)", "source_date": "2026-08-31", "content": "SYNTHETIC|Merlion Harbour Bank|savings statement|2026-08-31|balance 18250.00 SGD|no nomination on record" },
+    { "key": "doc_fd_receipt", "tenant": "patel", "owner": "ramesh", "kind": "fd_receipt", "title": "Fixed deposit receipt, Oct 2026 (synthetic)", "source_date": "2026-10-10", "state": "after", "content": "SYNTHETIC|Sagar Bharat Bank|fixed deposit receipt|2026-10-10|principal 500000.00 INR|tenure 36 months|maturity 2029-10-10|nominee registered" },
+    { "key": "doc_mehta_stmt", "tenant": "mehta", "owner": "kavita", "kind": "statement", "title": "Savings statement (synthetic, other tenant)", "source_date": "2026-07-31", "content": "SYNTHETIC|Sagar Bharat Bank|savings statement|2026-07-31|balance 120000.00 INR" }
+  ],
+  "assets": [
+    {
+      "key": "savings", "tenant": "patel", "owner": "ramesh", "type": "savings",
+      "versions": [
+        {
+          "change_kind": "create", "label": "Savings account", "institution_name": "Sagar Bharat Bank", "jurisdiction": "IN",
+          "masked_reference": "••••4821", "currency": "INR", "balance_minor": 34215000,
+          "nomination_status": "recorded", "source_date": "2023-03-31", "verification_state": "document_extracted",
+          "document_location": "Passbook in the steel almirah, main bedroom",
+          "evidence": [
+            { "field": "balance_minor", "observed": "34215000", "source": "document", "document": "doc_savings_stmt_2023", "page": 1, "confidence": 0.96 },
+            { "field": "nomination_status", "observed": "recorded", "source": "document", "document": "doc_savings_stmt_2023", "page": 1, "confidence": 0.91 }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "mutual_fund", "tenant": "patel", "owner": "ramesh", "type": "mutual_fund",
+      "versions": [
+        {
+          "change_kind": "create", "label": "Equity mutual fund folio", "institution_name": "Kaveri Mutual Fund", "jurisdiction": "IN",
+          "masked_reference": "••••5512", "currency": "INR", "balance_minor": 87540000, "sip_installment_minor": 1000000,
+          "nomination_status": "not_recorded", "source_date": "2026-09-30", "verification_state": "document_extracted",
+          "evidence": [
+            { "field": "balance_minor", "observed": "87540000", "source": "document", "document": "doc_mf_stmt_2026_09", "page": 1, "confidence": 0.97 },
+            { "field": "balance_minor", "observed": "90000000", "source": "user_message", "conflicts_with_current": true },
+            { "field": "sip_installment_minor", "observed": "1000000", "source": "document", "document": "doc_mf_stmt_2026_09", "page": 2, "confidence": 0.94 },
+            { "field": "nomination_status", "observed": "not_recorded", "source": "document", "document": "doc_mf_stmt_2026_09", "page": 2, "confidence": 0.88 }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "life_policy", "tenant": "patel", "owner": "ramesh", "type": "life_insurance",
+      "versions": [
+        {
+          "change_kind": "create", "label": "Term life policy", "institution_name": "Navjeevan Life Assurance", "jurisdiction": "IN",
+          "masked_reference": "••••0193", "currency": "INR", "insurance_cover_minor": 500000000,
+          "nomination_status": "unknown", "source_date": "2025-04-01", "verification_state": "document_extracted",
+          "document_location": "Policy bond in the blue folder, study cupboard",
+          "evidence": [
+            { "field": "insurance_cover_minor", "observed": "500000000", "source": "document", "document": "doc_life_schedule", "page": 1, "confidence": 0.95 }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "property", "tenant": "patel", "owner": "ramesh", "type": "property",
+      "versions": [
+        {
+          "change_kind": "create", "label": "Flat, Kothrud, Pune (home loan with Sagar Bharat Bank)", "institution_name": "Sagar Bharat Bank", "jurisdiction": "IN",
+          "currency": "INR", "estimated_value_minor": 850000000, "liability_minor": 124000000,
+          "nomination_status": "not_applicable", "source_date": "2026-06-30", "verification_state": "user_reported",
+          "document_location": "Original sale deed in bank locker, Sagar Bharat Bank",
+          "evidence": [
+            { "field": "estimated_value_minor", "observed": "850000000", "source": "user_message" },
+            { "field": "liability_minor", "observed": "124000000", "source": "document", "document": "doc_property_list", "page": 1, "confidence": 0.71 }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "pension", "tenant": "patel", "owner": "ramesh", "type": "pension",
+      "versions": [
+        {
+          "change_kind": "create", "label": "Pension account", "institution_name": "Rashtriya Pension Trust", "jurisdiction": "IN",
+          "masked_reference": "••••6604", "currency": "INR", "balance_minor": 140000000,
+          "nomination_status": "unknown", "source_date": "2025-03-31", "verification_state": "user_reported",
+          "evidence": [ { "field": "balance_minor", "observed": "140000000", "source": "user_message" } ]
+        },
+        {
+          "change_kind": "correct", "label": "Pension account", "institution_name": "Rashtriya Pension Trust", "jurisdiction": "IN",
+          "masked_reference": "••••6604", "currency": "INR", "balance_minor": 146000000,
+          "nomination_status": "recorded", "source_date": "2026-03-31", "verification_state": "document_extracted",
+          "evidence": [
+            { "field": "balance_minor", "observed": "146000000", "source": "document", "document": "doc_pension_stmt_2026", "page": 1, "confidence": 0.95 },
+            { "field": "nomination_status", "observed": "recorded", "source": "document", "document": "doc_pension_stmt_2026", "page": 1, "confidence": 0.9 }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "sgd_savings", "tenant": "patel", "owner": "ramesh", "type": "savings",
+      "versions": [
+        {
+          "change_kind": "create", "label": "SGD savings account", "institution_name": "Merlion Harbour Bank", "jurisdiction": "SG",
+          "masked_reference": "••••3307", "currency": "SGD", "balance_minor": 1825000,
+          "nomination_status": "not_recorded", "source_date": "2026-08-31", "verification_state": "document_extracted",
+          "evidence": [ { "field": "balance_minor", "observed": "1825000", "source": "document", "document": "doc_sgd_stmt", "page": 1, "confidence": 0.96 } ]
+        }
+      ]
+    },
+    {
+      "key": "fd", "tenant": "patel", "owner": "ramesh", "type": "fixed_deposit", "state": "after",
+      "proposal": {
+        "channel": "fixture", "utterance_tag": "I opened an SBI FD for ₹5 lakh for 3 years", "model_version": "fixture-v1"
+      },
+      "versions": [
+        {
+          "change_kind": "create", "label": "Fixed deposit (3 years)", "institution_name": "Sagar Bharat Bank", "jurisdiction": "IN",
+          "masked_reference": "••••7730", "currency": "INR", "balance_minor": 50000000,
+          "opened_on": "2026-10-10", "maturity_on": "2029-10-10", "term_months": 36,
+          "nomination_status": "recorded", "source_date": "2026-10-10", "verification_state": "document_extracted",
+          "evidence": [
+            { "field": "balance_minor", "observed": "50000000", "source": "user_message" },
+            { "field": "balance_minor", "observed": "50000000", "source": "document", "document": "doc_fd_receipt", "page": 1, "confidence": 0.98 },
+            { "field": "term_months", "observed": "36", "source": "document", "document": "doc_fd_receipt", "page": 1, "confidence": 0.97 },
+            { "field": "nomination_status", "observed": "recorded", "source": "document", "document": "doc_fd_receipt", "page": 1, "confidence": 0.9 }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "mehta_savings", "tenant": "mehta", "owner": "kavita", "type": "savings",
+      "versions": [
+        {
+          "change_kind": "create", "label": "Savings account", "institution_name": "Sagar Bharat Bank", "jurisdiction": "IN",
+          "masked_reference": "••••9054", "currency": "INR", "balance_minor": 12000000,
+          "nomination_status": "unknown", "source_date": "2026-07-31", "verification_state": "document_extracted",
+          "evidence": [ { "field": "balance_minor", "observed": "12000000", "source": "document", "document": "doc_mehta_stmt", "page": 1, "confidence": 0.95 } ]
+        }
+      ]
+    }
+  ],
+  "relationships": [
+    { "key": "rel_daughter", "tenant": "patel", "kind": "family_relation", "from": ["user", "ramesh"], "to": ["user", "priya"], "detail": "daughter", "verification_state": "user_reported", "created_by": "ramesh" },
+    { "key": "rel_trusted", "tenant": "patel", "kind": "trusted_contact", "from": ["user", "ramesh"], "to": ["user", "priya"], "verification_state": "user_reported", "created_by": "ramesh" },
+    { "key": "rel_nominee_savings", "tenant": "patel", "kind": "registered_nominee", "from": ["user", "priya"], "to": ["asset", "savings"], "verification_state": "document_extracted", "evidence_document": "doc_savings_stmt_2023", "created_by": "ramesh" }
+  ],
+  "grants": [
+    { "key": "grant_priya_pre", "tenant": "patel", "owner": "ramesh", "grantee": "priya", "stage": "pre_handover", "asset_keys": [], "sections": ["contacts", "document_locations"] },
+    { "key": "grant_priya_post", "tenant": "patel", "owner": "ramesh", "grantee": "priya", "stage": "post_release", "asset_keys": ["savings", "mutual_fund", "life_policy", "property", "pension"], "sections": ["inventory", "passport", "evidence_index", "claim_checklist"] }
+  ],
+  "recovery_profiles": [
+    { "tenant": "patel", "owner": "ramesh", "legal_name": "Ramesh Kumar Patel", "name_variants": ["Ramesh Patel"], "date_of_birth": "1958-03-14",
+      "addresses": [
+        { "line": "12 Navrangpura, Ahmedabad", "pincode": "380009", "from": "1984-01-01", "to": "2009-12-31" },
+        { "line": "Baner Road, Pune", "pincode": "411045", "from": "2010-01-01", "to": null }
+      ] }
+  ]
+}

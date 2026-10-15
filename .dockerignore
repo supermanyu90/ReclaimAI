@@ -1,0 +1,13 @@
+.git
+.env
+.env.*
+!.env.example
+.venv
+**/__pycache__
+**/.pytest_cache
+**/.ruff_cache
+.data
+**/node_modules
+apps/web/.next
+infra/terraform/.terraform
+infra/terraform/*.tfstate*
