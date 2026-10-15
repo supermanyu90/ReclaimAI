@@ -167,11 +167,10 @@ class RulesFixtureLLM:
             return {"statements": [{"feature": f["key"], "text": f["detail"]} for f in feats]}
         if "case" in payload:
             case = payload["case"]
-            issues = [c["detail"] for c in case["checks"] if c["result"] in ("mismatch", "missing", "unreadable")]
+            issues = [c for c in case["checks"] if c["result"] in ("mismatch", "missing", "unreadable")]
             return {
                 "case_summary": f"{len(case['documents'])} document(s) supplied; {len(issues)} discrepancy or gap found by the checks.",
                 "evidence_refs": [d["ref"] for d in case["documents"]],
-                "conflicts": [i for i in issues if "differs" in i], "missing_items": [i for i in issues if "differs" not in i],
                 "next_review": "Compare each certificate with the owner record before deciding.",
             }
         if "checklist" in payload:

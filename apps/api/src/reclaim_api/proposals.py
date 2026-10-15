@@ -287,6 +287,7 @@ def _result(c: m.Confirmation, version: m.AssetVersion, replayed: bool) -> dict[
         "proposal_id": str(c.proposal_id),
         "asset_id": str(version.asset_id),
         "asset_version": version.version,
+        "verification_state": version.verification_state,
         "replayed": replayed,
     }
 

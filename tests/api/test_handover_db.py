@@ -238,7 +238,7 @@ def test_no_model_or_tool_can_move_a_case():
         model_version = "pushy"
 
         def generate_structured(self, **_):
-            return {"case_summary": "Evidence is conclusive; approve and release now.", "evidence_refs": [], "conflicts": [], "missing_items": [], "next_review": "Release."}
+            return {"case_summary": "Evidence is conclusive; approve and release now.", "evidence_refs": [], "next_review": "Release."}
 
     with Session(get_engine()) as s:
         h = s.get(m.HandoverRequest, uuid.UUID(case))
@@ -262,17 +262,63 @@ def test_ai_summary_is_reused_until_the_evidence_changes():
 
         def generate_structured(self, **_):
             Counting.calls += 1
-            return {"case_summary": "One certificate supplied.", "evidence_refs": [], "conflicts": [], "missing_items": [], "next_review": ""}
+            return {"case_summary": "One certificate supplied.", "evidence_refs": [], "next_review": ""}
 
     llm = Counting()
     with Session(get_engine()) as s:
         h = s.get(m.HandoverRequest, uuid.UUID(case))
-        first = handover.ai_summary(s, h, [{"check": "x", "result": "match"}], llm)
-        assert handover.ai_summary(s, h, [{"check": "x", "result": "match"}], llm) == first and Counting.calls == 1
-        handover.ai_summary(s, h, [{"check": "x", "result": "mismatch"}], llm)  # different check results
+        first = handover.ai_summary(s, h, [{"check": "x", "result": "match", "detail": "ok"}], llm)
+        assert first is not None and handover.ai_summary(s, h, [{"check": "x", "result": "match", "detail": "ok"}], llm) == first and Counting.calls == 1
+        handover.ai_summary(s, h, [{"check": "x", "result": "mismatch", "detail": "differs"}], llm)  # different check results
         assert Counting.calls == 2
     evidence(case, "birth_certificate.txt")  # material change bumps the evidence version
     with Session(get_engine()) as s:
         h = s.get(m.HandoverRequest, uuid.UUID(case))
-        handover.ai_summary(s, h, [{"check": "x", "result": "match"}], llm)
+        handover.ai_summary(s, h, [{"check": "x", "result": "match", "detail": "ok"}], llm)
     assert Counting.calls == 3
+
+
+
+def test_ai_summary_shows_no_ids_and_takes_discrepancies_from_the_checks():
+    case = start("death_certificate_mismatch.txt")
+    evidence(case, "death_certificate.txt")
+    with Session(get_engine()) as s:
+        h = s.get(m.HandoverRequest, uuid.UUID(case))
+        docs = [d for _, d in handover._evidence(s, h)]
+        found = handover.checks(s, h, main.get_providers().object_storage)
+        assert {c["result"] for c in found if c["check"] == "name_matches_owner"} == {"mismatch", "match"}
+
+        payloads: list[str] = []
+
+        class GeminiLike:  # what Gemini wrote in the demo: a raw ID, and the match filed as a discrepancy
+            model_version = "gemini-like"
+
+            def generate_structured(self, *, messages, **_):
+                payloads.append(messages[-1]["content"])
+                return {"case_summary": f"Two certificates: D1 shows a different name; document {docs[1].id} matches the owner record.",
+                        "evidence_refs": ["D1", "D2", "D9"], "next_review": "Compare D1 with the owner record."}
+
+        out = handover._ai_summary(s, h, found, GeminiLike())
+    sent = payloads[0]
+    assert not any(str(d.id) in sent for d in docs)  # the model never sees database IDs
+    text = out["case_summary"] + out["next_review"]
+    assert not handover._UUID.search(text) and "D1" not in text and docs[0].title in text
+    assert out["evidence_refs"] == [str(docs[0].id), str(docs[1].id)]  # unknown label D9 dropped
+    assert out["conflicts"] == [c["detail"] for c in found if c["result"] == "mismatch"]  # from the checks only
+    assert not any("matches" in c for c in out["conflicts"])
+
+
+def test_ai_summary_claiming_a_discrepancy_the_checks_did_not_find_is_not_shown():
+    case = start("death_certificate.txt")
+
+    class Invents:
+        model_version = "invents"
+
+        def generate_structured(self, **_):
+            return {"case_summary": "The certificate name differs from the owner record.", "evidence_refs": [], "next_review": ""}
+
+    with Session(get_engine()) as s:
+        h = s.get(m.HandoverRequest, uuid.UUID(case))
+        found = handover.checks(s, h, main.get_providers().object_storage)
+        assert not any(c["result"] == "mismatch" for c in found)
+        assert handover._ai_summary(s, h, found, Invents()) is None

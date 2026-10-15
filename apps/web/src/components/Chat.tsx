@@ -112,11 +112,14 @@ function ReviewCard({ proposal, onChange }: { proposal: Proposal; onChange: (p: 
     setBusy(true);
     setError(null);
     try {
-      const r = await api<{ asset_version: number; replayed: boolean; detail?: { message: string } }>(
+      const r = await api<{ asset_version: number; verification_state?: string; replayed: boolean; detail?: { message: string } }>(
         `proposals/${proposal.id}/confirm`,
         { method: 'POST', headers: { 'Idempotency-Key': keyRef.current } },
       );
-      if (r.ok) onChange(null, `Recorded (version ${r.body.asset_version}). Owner-reported; not verified by the institution.`);
+      if (r.ok) {
+        const basis = r.body.verification_state === 'document_extracted' ? 'From your words and the document you added' : 'Owner-reported';
+        onChange(null, `Recorded (version ${r.body.asset_version}). ${basis}; not verified by the institution.`);
+      }
       else setError(r.body.detail?.message ?? `Could not confirm (${r.status}).`);
     } catch {
       setError('Network problem. Your confirmation can be retried safely.');
