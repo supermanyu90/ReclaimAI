@@ -137,7 +137,34 @@ def test_gemini_non_json_is_invalid_output_and_api_errors_are_unavailable():
     with pytest.raises(ProviderUnavailable) as exc:
         llm.generate_structured(system="", messages=[], schema={})
     assert "permission denied" not in str(exc.value)  # upstream text never propagates
-    assert llm.status().state == "unavailable" and "ClientError" in llm.status().detail
+    assert llm.status().state == "unavailable" and "ClientError 403" in llm.status().detail
+    assert len(llm._get_client().models.calls) == 1  # a 403 is not retried
+
+
+class Flaky(FakeModels):
+    def __init__(self, failures: int, code: int):
+        super().__init__(text=json.dumps({"intent": "other"}))
+        self.failures, self.code = failures, code
+
+    def generate_content(self, **kwargs):
+        self.calls.append(kwargs)
+        if len(self.calls) <= self.failures:
+            from google.genai import errors
+
+            raise errors.ClientError(self.code, {"error": {"message": "slow down"}}) if self.code < 500 else errors.ServerError(self.code, {"error": {"message": "x"}})
+        return type("R", (), {"text": self.text})()
+
+
+def test_gemini_retries_rate_limits_and_unavailability_a_bounded_number_of_times(monkeypatch):
+    monkeypatch.setattr(GeminiVertexLLM, "BACKOFF_S", 0)
+    for code in (429, 503):
+        models = Flaky(failures=2, code=code)
+        assert gemini(models).generate_structured(system="", messages=[], schema={}) == {"intent": "other"} and len(models.calls) == 3
+    models = Flaky(failures=5, code=429)
+    llm = gemini(models)
+    with pytest.raises(ProviderUnavailable):
+        llm.generate_structured(system="", messages=[], schema={})
+    assert len(models.calls) == 1 + GeminiVertexLLM.RETRIES and "429" in llm.status().detail
 
 
 # --- Ollama adapter (mock transport) -----------------------------------------------------

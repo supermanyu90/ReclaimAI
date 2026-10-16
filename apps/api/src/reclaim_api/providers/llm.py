@@ -11,6 +11,7 @@ ProviderUnavailable and the chat says so.
 import json
 import re
 import threading
+import time
 from typing import Any
 
 import httpx
@@ -49,6 +50,9 @@ class _CallTracker:
 
 
 class GeminiVertexLLM:
+    RETRIES = 2
+    BACKOFF_S = 1.0
+
     def __init__(self, *, project: str | None, location: str | None, model: str | None, timeout_s: float, client: Any = None, thinking_budget: int = 0) -> None:
         self._project, self._location, self._model = project, location, model
         self._thinking_budget = thinking_budget
@@ -91,11 +95,22 @@ class GeminiVertexLLM:
             # truncate the JSON. Extraction needs no reasoning trace, so it is off unless configured.
             thinking_config=types.ThinkingConfig(thinking_budget=self._thinking_budget),
         )
-        try:
-            response = self._get_client().models.generate_content(model=self._model, contents=contents, config=config)
-        except (genai_errors.APIError, GoogleAuthError, httpx.HTTPError, OSError) as err:
-            self._calls.record(False, type(err).__name__)
-            raise ProviderUnavailable(f"llm call failed ({type(err).__name__})") from None
+        # Rate limits and brief unavailability are retried a bounded number of times; anything
+        # else fails at once. Only the error type and HTTP status are kept (never the message).
+        for attempt in range(self.RETRIES + 1):
+            try:
+                response = self._get_client().models.generate_content(model=self._model, contents=contents, config=config)
+                break
+            except genai_errors.APIError as err:
+                code = getattr(err, "code", None)
+                if code in (429, 503) and attempt < self.RETRIES:
+                    time.sleep(self.BACKOFF_S * 2**attempt)
+                    continue
+                self._calls.record(False, f"{type(err).__name__} {code}")
+                raise ProviderUnavailable(f"llm call failed ({type(err).__name__} {code})") from None
+            except (GoogleAuthError, httpx.HTTPError, OSError) as err:
+                self._calls.record(False, type(err).__name__)
+                raise ProviderUnavailable(f"llm call failed ({type(err).__name__})") from None
         self._calls.record(True)
         return _parse_json(getattr(response, "text", None))
 
