@@ -5,7 +5,7 @@ carries window, sample size, rule/threshold and explanation; scope comes from th
 import importlib
 import uuid
 from collections import defaultdict
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, timedelta
 
 import pytest
 from fastapi.testclient import TestClient
@@ -142,7 +142,8 @@ def test_schema_errors_are_recorded_as_pipeline_errors():
                    aggregate_version=1, event_type="transaction.recorded", occurred_at=datetime(2026, 9, 1, tzinfo=UTC),
                    payload={"account_token": "a", "transaction_id": "t", "amount_minor": -5, "direction": "debit", "currency": "INR", "feed_category": "other"})  # fmt: skip
     WAREHOUSE.ingest(TRANSACTIONS_TOPIC, bad)
-    errors = summary(start="2026-10-01", end="2026-10-15")["pipeline_errors"]
+    # Errors are counted by when they were ingested (now), so the window must include today.
+    errors = summary(start="2026-10-01", end=(date.today() + timedelta(days=1)).isoformat())["pipeline_errors"]
     assert errors == [{"topic": "transactions", "reason": "payload.amount_minor must be positive", "errors": 1}]
 
 
