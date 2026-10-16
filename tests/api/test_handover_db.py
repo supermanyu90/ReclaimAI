@@ -322,3 +322,11 @@ def test_ai_summary_claiming_a_discrepancy_the_checks_did_not_find_is_not_shown(
         found = handover.checks(s, h, main.get_providers().object_storage)
         assert not any(c["result"] == "mismatch" for c in found)
         assert handover._ai_summary(s, h, found, Invents()) is None
+
+
+
+def test_overlong_model_text_is_trimmed_not_discarded():
+    long_review = "The case requires review due to conflicting names. " + "One certificate shows a mismatch while the other matches. " * 6
+    clipped = handover._fit({"case_summary": "Two certificates were supplied.", "next_review": long_review, "evidence_refs": []})
+    assert len(clipped["next_review"]) <= 240 and clipped["next_review"].endswith(".")
+    assert handover.CaseSummary.model_validate(clipped)
