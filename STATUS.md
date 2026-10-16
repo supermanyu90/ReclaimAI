@@ -159,6 +159,10 @@ Hosted demo on Google Cloud, project `hackathonapac` (the account's project quot
 | **Full rehearsal against the cloud API** (owner identity token in X-Serverless-Authorization) | Every step passed; 21.6 s API time; capabilities afterwards: llm **live** (Gemini 2.5 Flash, asia-south1), object_storage **live** (GCS) |
 | Cloud Logging, severity ≥ ERROR since deploy | none; no chat or registry text found in logs |
 | `deploy.sh reset` after rehearsal | 6 assets again |
+| Loose ends fixed (2026-10-16) | Reviewer AI summary: documents sent to the model as D1/D2, IDs scrubbed, labels replaced by file names; discrepancies and missing items written by the server from its checks; a summary claiming a mismatch the checks did not find is hidden; overlong fields trimmed at a sentence instead of discarding the summary. Confirmation banner now says "from your words and the document you added" when a document supplied evidence |
+| Gemini on Cloud Run | First reviewer-summary calls failed with `ClientError`; the adapter now retries 429/503 twice with backoff and records the HTTP status. After redeploy: summary shown, `llm live`, no IDs, discrepancies = the one real mismatch |
+| Latent test bug | `test_schema_errors_are_recorded_as_pipeline_errors` used a fixed window ending 2026-10-15 and failed once the date changed; window now includes today. 291 passed |
+| GitHub | History squashed to one commit (references removed); 32 Actions runs for the old commits deleted (run IDs cited above for Prompts 1–14 no longer exist on GitHub) |
 | Not done | Web flow through the passcode gate in a browser on the cloud URL (I don't type a live credential into a public site; verified locally with a test passcode) |
 
 Hosted demo preparation (`APP_MODE=demo`), run 2026-10-15. Nothing on Google Cloud yet.
