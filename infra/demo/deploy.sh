@@ -41,7 +41,7 @@ project ${PROJECT_ID} in ${REGION}, billed to ${BILLING_ACCOUNT:-<BILLING_ACCOUN
                         Cloud Build (image builds), Artifact Registry + Cloud Storage (small)
   free / config       : service accounts, IAM, Secret Manager (few versions), budget alert
   budget alert        : ${BUDGET_AMOUNT} ${BUDGET_CURRENCY}/month at 50/90/100% (an alert, NOT a cap)
-  access              : web public behind a passcode; api private (only the web service may call it)
+  access              : web public (synthetic-person sign-in); api private (only the web service may call it)
   teardown            : infra/demo/deploy.sh destroy  (deletes the ReclaimAI resources only)
 PLAN
 }
@@ -78,7 +78,6 @@ infra() {
   fi
   secret reclaim-channel-hash-key
   secret reclaim-worker-push-token
-  secret reclaim-demo-passcode 6
   for s in api worker web; do
     g iam service-accounts describe "$(sa $s)" >/dev/null 2>&1 || g iam service-accounts create "reclaim-$s" --display-name="ReclaimAI $s"
   done
@@ -91,7 +90,6 @@ infra() {
       g secrets add-iam-policy-binding "$sec" --member="serviceAccount:$(sa $s)" --role=roles/secretmanager.secretAccessor >/dev/null
     done
   done
-  g secrets add-iam-policy-binding reclaim-demo-passcode --member="serviceAccount:$(sa web)" --role=roles/secretmanager.secretAccessor >/dev/null
   g projects add-iam-policy-binding "$PROJECT_ID" --member="serviceAccount:$(sa web)" --role=roles/logging.logWriter --condition=None >/dev/null
   # Cloud Build's default identity pushes images and writes build logs.
   build_sa="$(number)-compute@developer.gserviceaccount.com"
@@ -128,7 +126,7 @@ deploy() {
     --no-allow-unauthenticated
   g run services add-iam-policy-binding reclaim-api --region="$REGION" --member="serviceAccount:$(sa web)" --role=roles/run.invoker >/dev/null
   g run deploy reclaim-web --image="$REPO/web:latest" --service-account="$(sa web)" --region="$REGION" \
-    --set-env-vars="API_URL=$(url api),API_AUDIENCE=$(url api)" --set-secrets="DEMO_PASSCODE=reclaim-demo-passcode:latest" \
+    --set-env-vars="API_URL=$(url api),API_AUDIENCE=$(url api)" \
     --min-instances=0 --max-instances=3 --memory=512Mi --allow-unauthenticated
   for job in migrate reset; do
     if [ "$job" = migrate ]; then cmd="alembic,-c,apps/api/alembic.ini,upgrade,head"; else cmd="reclaim-demo,reset"; fi
@@ -142,10 +140,10 @@ deploy() {
 }
 
 status() {
-  echo "web    $(url web)   (passcode: gcloud secrets versions access latest --secret=reclaim-demo-passcode --project=$PROJECT_ID)"
+  echo "web    $(url web)"
   echo "api    $(url api)   (private)"
   echo "worker $(url worker)"
-  curl -s -o /dev/null -w "web /gate → %{http_code}\n" "$(url web)/gate"
+  curl -s -o /dev/null -w "web /signin → %{http_code}\n" "$(url web)/signin"
   curl -s -o /dev/null -w "api without identity → %{http_code} (expect 403)\n" "$(url api)/readyz"
   curl -s -o /dev/null -w "worker task without token → %{http_code} (expect 401)\n" -X POST "$(url worker)/tasks/publish-outbox"
 }
@@ -160,7 +158,7 @@ destroy() {
   g run jobs delete reclaim-migrate --region="$REGION" || true
   g run jobs delete reclaim-reset --region="$REGION" || true
   g sql instances delete "$SQL_INSTANCE" || true
-  for sec in reclaim-database-url reclaim-channel-hash-key reclaim-worker-push-token reclaim-demo-passcode; do g secrets delete "$sec" || true; done
+  for sec in reclaim-database-url reclaim-channel-hash-key reclaim-worker-push-token; do g secrets delete "$sec" || true; done
   g storage rm -r "gs://$BUCKET" || true
   g artifacts repositories delete reclaimai --location="$REGION" || true
   for s in api worker web; do g iam service-accounts delete "$(sa $s)" || true; done

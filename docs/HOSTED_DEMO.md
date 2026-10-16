@@ -1,6 +1,6 @@
 # Hosted demo on Cloud Run (`APP_MODE=demo`)
 
-A shareable copy of the local demo: synthetic data only, behind a passcode. This is not the
+A shareable copy of the local demo: synthetic data only, open to anyone with the link. This is not the
 full cloud architecture in `docs/DEPLOYMENT.md` (Identity Platform, Document AI, Vertex AI
 Search, Pub/Sub, BigQuery); it keeps those parts built in, as locally.
 
@@ -8,14 +8,14 @@ Search, Pub/Sub, BigQuery); it keeps those parts built in, as locally.
 |---|---|---|---|
 | Web, API, worker | Cloud Run | your machine | Cloud Run |
 | Database | Cloud SQL PostgreSQL 16, db-f1-micro | Docker Postgres | Cloud SQL |
-| Sign-in | synthetic-person picker, behind a passcode | picker | Identity Platform |
+| Sign-in | synthetic-person picker | picker | Identity Platform |
 | LLM | Gemini on Vertex AI | Gemma 3 4B via Ollama | Gemini |
 | Files | private Cloud Storage bucket | local disk | Cloud Storage |
 | Documents, policy search, analytics, events | built in (same as local) | built in | Document AI, Vertex AI Search, BigQuery, Pub/Sub |
 
 ## Access
 
-- **Web** is public, but every page and API call needs the passcode first. The passcode is a random secret in Secret Manager; read it with the command `deploy.sh status` prints.
+- **Web** is public: anyone with the link can sign in as a synthetic person. All visitors share the same synthetic data, so run `deploy.sh reset` before a presentation. A passcode gate is built in but off; setting `DEMO_PASSCODE` on the web service turns it on.
 - **API** is private. Cloud Run admits only the web service's identity, sent as `X-Serverless-Authorization`, so the app's own `Authorization` header stays free.
 - **Worker** is reachable at the network level, but every endpoint requires `WORKER_PUSH_TOKEN` (Secret Manager). The built-in local token is refused in demo mode.
 - **Secrets:** no secret is in the images or the repository. `.gcloudignore` keeps `.env` and `.data/` out of Cloud Build uploads.

@@ -163,6 +163,7 @@ Hosted demo on Google Cloud, project `hackathonapac` (the account's project quot
 | Gemini on Cloud Run | First reviewer-summary calls failed with `ClientError`; the adapter now retries 429/503 twice with backoff and records the HTTP status. After redeploy: summary shown, `llm live`, no IDs, discrepancies = the one real mismatch |
 | Latent test bug | `test_schema_errors_are_recorded_as_pipeline_errors` used a fixed window ending 2026-10-15 and failed once the date changed; window now includes today. 291 passed |
 | GitHub | History squashed to one commit (references removed); 32 Actions runs for the old commits deleted (run IDs cited above for Prompts 1–14 no longer exist on GitHub) |
+| Passcode removed (2026-10-16) | `DEMO_PASSCODE` taken off `reclaim-web` (revision reclaim-web-00005); `/workspace` → 307 to `/signin`, `/signin` 200 listing the synthetic people; secret `reclaim-demo-passcode` deleted; deploy script no longer sets it. API stays private, worker stays token-locked |
 | Not done | Web flow through the passcode gate in a browser on the cloud URL (I don't type a live credential into a public site; verified locally with a test passcode) |
 
 Hosted demo preparation (`APP_MODE=demo`), run 2026-10-15. Nothing on Google Cloud yet.
